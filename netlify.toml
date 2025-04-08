@@ -4,9 +4,6 @@
 [functions]
   node_bundler = "esbuild"  # Ensures proper bundling
 
-[build.environment]
-  NODE_VERSION = "16"       # Netlify defaults to 14 (which can cause issues)
-
 [dev]
   framework = "vite"
   targetPort = 5173
