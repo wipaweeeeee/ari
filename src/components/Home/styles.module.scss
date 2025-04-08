@@ -1,0 +1,82 @@
+.container {
+    .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: $yellow;
+        text-transform: uppercase;
+        font-size: 50px;
+        text-align: center;
+
+        .buttonsContainer {
+            display: flex;
+            margin-top: 32px;
+            font-size: 28px;
+
+            .button {
+                padding: 20px 120px;
+                border-radius: 99px;
+                border: 1px solid $yellow;
+                cursor: pointer;
+
+                &:first-child {
+                    background-color: $yellow;
+                    color: #000;
+                    margin-right: 90px;
+                }
+                
+            }
+        }
+    }  
+
+    .bg {
+        background-image: url('/bg.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: calc(100% + 100px);
+        height: calc(100% + 100px);
+        // filter: blur(25px);
+        position: fixed;
+        top: -50px;
+        left: -50px;
+        z-index: -1;
+        animation: blur-animation 8s ease infinite;
+    }
+}
+
+@keyframes blur-animation {
+    from {
+        filter: blur(25px);
+    }
+    
+    50% {
+        filter: blur(10px);
+    }
+    to {
+        filter: blur(25px);
+    }
+  }
+
+@include tablet { 
+    .container {
+        padding: 0 14px;
+        .content { 
+            font-size: 40px;
+
+            .buttonsContainer { 
+                font-size: 14px;
+
+                .button {
+                    padding: 15px 60px; 
+
+                    &:first-child {
+                        margin-right: 24px;
+                    }
+                }
+            }
+        } 
+    }
+}

@@ -1,0 +1,32 @@
+//color variables
+$yellow: #E5D166;
+
+//breakpoint variables
+$tablet-width: 768px;
+$desktop-width: 1024px;
+
+@mixin mobile {
+	@media (max-width: #{$tablet-width - 1px}) {
+		@content;
+	}
+}
+
+@mixin tablet {
+  @media (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$desktop-width}) {
+    @content;
+  }
+}
+
+//font-face
+@font-face {
+  font-family: 'ApercuMono';
+  src: url('/ApercuMono.otf') format('truetype'); 
+  font-weight: normal;
+  font-style: normal;
+}
