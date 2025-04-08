@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import axios from 'axios';
 
 export const handler = async (event) => {
   const { fileId } = event.queryStringParameters;
@@ -13,25 +13,30 @@ export const handler = async (event) => {
 
   try {
     // First try the direct download link
-    let response = await fetch(`https://drive.google.com/uc?export=download&id=${fileId}`);
-    
-    // If that fails (returns HTML), try the viewer link
-    const contentType = response.headers.get('content-type');
+    let response = await axios.get(`https://drive.google.com/uc?export=download&id=${fileId}`, {
+      responseType: 'arraybuffer',
+      validateStatus: () => true // Don't throw on HTTP errors
+    });
+
+    // If response looks like HTML (failed download), try the viewer link
+    const contentType = response.headers['content-type'];
     if (contentType?.includes('text/html')) {
-      response = await fetch(`https://drive.google.com/uc?export=view&id=${fileId}`);
+      response = await axios.get(`https://drive.google.com/uc?export=view&id=${fileId}`, {
+        responseType: 'arraybuffer'
+      });
     }
 
-    if (!response.ok) {
+    // Check for successful response
+    if (response.status < 200 || response.status >= 300) {
       throw new Error(`Google Drive responded with ${response.status}`);
     }
 
-    // Get the image as ArrayBuffer
-    const buffer = await response.arrayBuffer();
-    const imageData = Buffer.from(buffer).toString('base64');
+    // Convert to base64
+    const imageData = Buffer.from(response.data).toString('base64');
     
-    // Verify it looks like valid base64 image data
+    // Basic base64 validation
     if (!/^[A-Za-z0-9+/]+={0,2}$/.test(imageData)) {
-      throw new Error('Invalid base64 image data received from Google Drive');
+      throw new Error('Invalid base64 image data received');
     }
 
     return {
@@ -39,15 +44,17 @@ export const handler = async (event) => {
       body: imageData,
       isBase64Encoded: true,
       headers: {
-        'Content-Type': response.headers.get('content-type') || 'image/jpeg',
-        'Cache-Control': 'public, max-age=86400'
+        'Content-Type': response.headers['content-type'] || 'image/jpeg',
+        'Cache-Control': 'public, max-age=86400',
+        'Access-Control-Allow-Origin': '*' // Important for CORS
       }
     };
   } catch (error) {
+    console.error('Error in fetch-image:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ 
-        error: 'Failed to fetch image',
+        error: 'Failed to fetch media',
         details: error.message 
       }),
       headers: { 'Content-Type': 'application/json' }
