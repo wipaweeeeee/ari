@@ -4,7 +4,7 @@ import useAriData from '@/hooks/useAriData';
 
 function App() {
   // useAriData returns an object with data, loading, and error properties
-  // data is an array of objects, each containing timestamp, name, message, and gid properties 
+  // data is an array of objects with the Google Sheets form responses, each containing timestamp, name, message, and gid properties 
   // loading is a boolean indicating if the data is still being fetched
   // error is a string containing any error message that occurred during the fetch
   const { data, loading, error } = useAriData();
