@@ -1,0 +1,48 @@
+.gridContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    .greeting {
+        color: $yellow;
+        text-transform: uppercase;
+        position: fixed;
+        left: 0;
+        top: 30%;
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .xoxo {
+        color: $yellow;
+        text-transform: uppercase;
+        position: fixed;
+        left: 0;
+        top: 72%;
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .imageCarousel {
+        position: fixed;
+        bottom: 28px;
+        left: 0;
+        display: flex;
+        overflow: scroll;
+        width: 100vw;
+        height: 144px;
+
+        .imageItem {
+            height: 140px;
+            margin-right: 12px;
+    
+            img {
+                height: 140px;
+                width: auto;
+                border-radius: 20px;
+            }
+        }
+    }
+}
