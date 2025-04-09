@@ -2,6 +2,19 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import styles from './styles.module.scss'
 import Grid from '@/components/Grid'
+import Nav from '@/components/Nav'
+
+var dataSet = [
+    {name: "Nicholas", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_1"},
+    {name: "Jane", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_2"},
+    {name: "Nao", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_3"},
+    {name: "Jeff", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_4"},
+    {name: "Wip", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_5"},
+    {name: "Joe", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_6"},
+    {name: "Kate", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_7"},
+    {name: "Maggio", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_8"},
+    {name: "Wong", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_9"},
+]
 
 const Home = () => {
 
@@ -10,8 +23,15 @@ const Home = () => {
 
     var imageAssets = ["ari_1", "ari_2", "ari_3", "ari_4", "ari_5", "ari_6", "ari_7", "ari_8", "ari_9"]
 
+    const handleMode = (mode) => {
+        setActiveMode(mode)
+    }
+
     return (
         <div className={styles.container}>
+            <AnimatePresence>
+                { enter && <Nav mode={activeMode} show={enter} handleMode={(mode) => handleMode(mode)}/>}
+            </AnimatePresence>
             <motion.div 
                 className={styles.content}
                 animate={enter ? { opacity: 0 } : { opacity : 1}}
@@ -25,9 +45,8 @@ const Home = () => {
             </motion.div>
 
             <AnimatePresence>
-            { enter &&  <Grid active={activeMode == "grid"} show={enter} imageAssets={imageAssets}/>}
+            { enter &&  <Grid show={enter} imageAssets={imageAssets} data={dataSet}/>}
             </AnimatePresence>
-            
            
             <div className={styles.bg}/>
         </div>
