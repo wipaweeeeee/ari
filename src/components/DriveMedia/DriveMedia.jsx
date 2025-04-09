@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import classNames from 'classnames'
+import styles from './styles.module.scss'
 
 // This component fetches and displays media from Google Drive based on a file ID.
 // It handles both images and videos, and provides error handling for unsupported media types.
-const DriveMedia = ({ fileId }) => {
+const DriveMedia = ({ fileId, className, activeId }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,12 +66,12 @@ const DriveMedia = ({ fileId }) => {
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <div className="drive-media-container">
+    <div className={className}>
       {mediaType === 'image' && (
         <img 
+          className={classNames({[styles.active] : fileId == activeId})}
           src={mediaUrl}
           alt="Google Drive content"
-          style={{ maxWidth: '100%', height: 'auto' }}
           onError={() => setError('Failed to load image')}
         />
       )}
@@ -77,7 +79,7 @@ const DriveMedia = ({ fileId }) => {
       {mediaType === 'video' && (
         <video 
           controls
-          style={{ maxWidth: '100%', height: 'auto' }}
+          className={classNames({[styles.active] : fileId == activeId})}
           onError={() => setError('Failed to load video')}
         >
           <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
