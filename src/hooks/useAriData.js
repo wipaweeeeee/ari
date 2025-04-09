@@ -21,11 +21,24 @@ const useAriData = () => {
                 });
 
                 const formatted = filtered.map((item) => {
+                    const link = item[3];
+                    let gid = null;
+
+                    if (link) {
+                        const openIdMatch = link.match(/open\?id=([^&]+)/);
+                        const fileIdMatch = link.match(/file\/d\/([^/]+)/);
+
+                        if (openIdMatch) {
+                            gid = openIdMatch[1];
+                        } else if (fileIdMatch) {
+                            gid = fileIdMatch[1];
+                        }
+                    }
                     return {
                         timestamp: item[0],
                         name: item[1],
                         message: item[2],
-                        gid: item[3]?.split('id=')[1] || null,
+                        gid: gid || null,
                     };
                 });
                 setData(formatted);

@@ -18,7 +18,7 @@ const DriveMedia = ({ fileId }) => {
     const fetchMedia = async () => {
       try {
         setLoading(true);
-        const url = `/.netlify/functions/fetch-image?fileId=${fileId}`;
+        const url = `/.netlify/functions/fetch-media?fileId=${fileId}`;
         const response = await fetch(url);
         
         if (!response.ok) {

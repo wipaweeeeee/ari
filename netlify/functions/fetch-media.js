@@ -50,7 +50,7 @@ export const handler = async (event) => {
       }
     };
   } catch (error) {
-    console.error('Error in fetch-image:', error);
+    console.error('Error in fetch-media:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ 
