@@ -5,24 +5,10 @@ import Grid from '@/components/Grid'
 import Nav from '@/components/Nav'
 import useAriData from '@/hooks/useAriData';
 
-var dataSet = [
-    {name: "Nicholas", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_1"},
-    {name: "Jane", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_2"},
-    {name: "Nao", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_3"},
-    {name: "Jeff", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_4"},
-    {name: "Wip", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_5"},
-    {name: "Joe", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_6"},
-    {name: "Kate", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_7"},
-    {name: "Maggio", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_8"},
-    {name: "Wong", content: "I WILL NEVER FORGET...Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", image: "ari_9"},
-]
-
 const Home = () => {
 
     const [ enter, setEnter ] = useState(false);
     const [ activeMode, setActiveMode ] = useState("grid");
-
-    var imageAssets = ["ari_1", "ari_2", "ari_3", "ari_4", "ari_5", "ari_6", "ari_7", "ari_8", "ari_9"]
 
     // useAriData returns an object with data, loading, and error properties
     // data is an array of objects with the Google Sheets form responses, each containing timestamp, name, message, and gid properties 
