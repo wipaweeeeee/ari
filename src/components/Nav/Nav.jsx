@@ -13,7 +13,7 @@ const Nav = ({mode, show, handleMode}) => {
         >
             <div className={classNames(styles.mode, {[styles.active] : mode == 'grid'})} onClick={() => handleMode('grid')}>grid</div>
             <div className={classNames(styles.mode, {[styles.active] : mode == 'chaos'})} onClick={() => handleMode('chaos')}>chaos</div>
-            <div className={styles.submitButton}>submit a post</div>
+            <a href="https://forms.gle/XQYU7Fbuh7oSKMvUA" target="_blank" className={styles.submitButton}>submit a post</a>
         </motion.div>
     )
 }

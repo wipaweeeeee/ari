@@ -1,27 +1,54 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './styles.module.scss'
 import { motion } from 'framer-motion'
 import classNames from 'classnames'
+import DriveMedia from '@/components/DriveMedia';
 
 const Grid = ({show, data}) => {
-
-    const [activeIndex, setActiveIndex] = useState(1);
-    const [activeImage, setActiveImage] = useState("");
+    
+    const [activeId, setActiveId] = useState();
     const [activeContent, setActiveContent] = useState("");
+    const [activeName, setActiveName] = useState("");
+    const [mobile, setMobile] = useState(false);
 
-    const handleSelect = (index) => {
-        setActiveIndex(index);
-        setActiveImage(data[index].image);
-        setActiveContent(data[index].content);
+    const handleSelect = (id) => {
+        setActiveId(id);
+
+        let message = data.filter(item => item.gid == id)[0].message;
+        let name = data.filter(item => item.gid == id)[0].name;
+        setActiveContent(message);
+        setActiveName(name);
     }
 
     let images = data && data.map((item, index) => {
+        if (item.gid != null) {
         return (
-            <div key={index} className={styles.imageItem} onClick={() => handleSelect(index)}>
-                <img className={classNames({[styles.active] : activeIndex == index})} src={`/${item.image}.jpg`} />
+            <div key={index} onClick={() => handleSelect(item.gid)}>
+                <DriveMedia fileId={item.gid} activeId={activeId} className={styles.imageItem} />
             </div>
         )
+        }
+       
     })
+
+    //handles responsive
+    useEffect(() => {
+
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setMobile(true);
+            } else {
+                setMobile(false);
+            }
+        }
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    },[])
 
     return (
         <motion.div
@@ -31,14 +58,29 @@ const Grid = ({show, data}) => {
             transition={{ duration: 0.25, ease: 'easeInOut', delay: 0.5 }}
             className={styles.gridContainer}
         >
-            <motion.div
-                className={styles.greeting}
-                initial={{ fontSize: '120px', lineHeight: '120px' }}
-                animate={{ fontSize: '20px', lineHeight: '20px', top: '40px', left: '32px', textAlign: 'left' }}
-                transition={{ duration: 0.5, ease: 'easeOut', delay: 1.5 }}
-            >
-                Happy 40th Birthday Ari!
+            {
+                !mobile && 
+                <motion.div
+                    className={styles.greeting}
+                    initial={{ fontSize: '120px', lineHeight: '120px' }}
+                    animate={{ fontSize: '20px', lineHeight: '20px', top: '40px', left: '32px', textAlign: 'left' }}
+                    transition={{ duration: 0.5, ease: 'easeOut', delay: 1.5 }}
+                >
+                    Happy 40th Birthday Ari!
+                </motion.div>
+            }
+            {
+                mobile &&
+                <motion.div
+                    className={styles.greeting}
+                    initial={{ fontSize: '60px', lineHeight: '60px' }}
+                    animate={{ fontSize: '20px', lineHeight: '20px', top: '73vh', left: '0', textAlign: 'center' }}
+                    transition={{ duration: 0.5, ease: 'easeOut', delay: 1.5 }}
+                >
+                    Happy 40th Birthday Ari!
             </motion.div>
+
+            }
             <motion.div
                 className={styles.xoxo}
                 animate={{ opacity: 0 }}
@@ -48,15 +90,16 @@ const Grid = ({show, data}) => {
             </motion.div>
             <motion.div
                 className={styles.imageContainer}
-                animate={  activeImage == "" ? { opacity: 0} : {opacity: 1}}
+                animate={  activeId == null ? { opacity: 0} : {opacity: 1}}
             >
-                <img className={styles.fullscreenImage} src={`/${activeImage}.jpg`} />
+                 <DriveMedia fileId={activeId} activeId={null} className={styles.fullscreenImage} />
             </motion.div>
             <motion.div
                 animate={  activeContent == "" ? { opacity: 0} : {opacity: 1}}
                 className={styles.messageContainer}
             >
                 <div>{activeContent}</div>
+                <div className={styles.name}>{activeName}</div>
             </motion.div>
             <motion.div
                 className={styles.imageCarousel}

@@ -38,27 +38,13 @@
         background-position: center;
         width: calc(100% + 100px);
         height: calc(100% + 100px);
-        // filter: blur(25px);
+        filter: blur(25px);
         position: fixed;
         top: -50px;
         left: -50px;
         z-index: -1;
-        animation: blur-animation 8s ease infinite;
     }
 }
-
-@keyframes blur-animation {
-    from {
-        filter: blur(25px);
-    }
-    
-    50% {
-        filter: blur(10px);
-    }
-    to {
-        filter: blur(25px);
-    }
-  }
 
 @include tablet { 
     .container {
