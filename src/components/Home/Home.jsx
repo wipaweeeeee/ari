@@ -50,7 +50,7 @@ const Home = () => {
             </motion.div>
 
             <AnimatePresence>
-            { enter &&  <Grid show={enter} imageAssets={imageAssets} data={shuffle(data)}/>}
+            { enter &&  <Grid show={enter} data={shuffle(data)}/>}
             </AnimatePresence>
            
             <div className={styles.bg}/>
