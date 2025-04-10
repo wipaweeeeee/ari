@@ -1,0 +1,14 @@
+.chaosContainer {
+    width: 100dvw;
+    height: 100dvh;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    .test {
+        width: 300px;
+        height: 300px;
+        background-color: red;
+        color: white;
+    }
+}

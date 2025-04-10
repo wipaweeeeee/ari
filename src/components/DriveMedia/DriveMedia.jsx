@@ -4,13 +4,30 @@ import styles from './styles.module.scss'
 
 // This component fetches and displays media from Google Drive based on a file ID.
 // It handles both images and videos, and provides error handling for unsupported media types.
-const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
+const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const videoRef = useRef();
+
+    //handle play video
+    // useEffect(() => {
+    //   if (play) {
+    //     if (videoRef.current != null) {
+    //       console.log('play')
+    //       videoRef.current.play();
+    //       videoRef.current.muted = false;
+    //     }
+    //   } else {
+    //     if (videoRef.current != null) { 
+    //       console.log('pause')
+    //       videoRef.current.pause();
+    //       videoRef.current.muted = true;
+    //     }
+    //   }
+    // },[play])
 
   useEffect(() => {
     if (!fileId) {
@@ -64,16 +81,26 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
     fetchMedia();
   }, [fileId]);
 
+  useEffect(() => {
+
+      if (mediaType == 'video') {
+        console.log("play video here")
+        if (videoRef.current != null) {
+          videoRef.current.play();
+          videoRef.current.muted = false;
+        }
+      } else {
+        console.log('pause video')
+        if (videoRef.current != null) { 
+          videoRef.current.pause();
+          videoRef.current.muted = true;
+        }
+      }
+    
+  },[mediaType])
+
   if (loading) return <div>Loading media...</div>;
   if (error) return <div className="error">Error: {error}</div>;
-
-  const handlePlayVideo = () => {
-    console.log('here');
-    if (!isThumbnail) {
-      videoRef.current.play();
-      videoRef.current.muted = false;
-    }
-  }
 
   return (
     <div className={className}>
@@ -86,15 +113,26 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
         />
       )}
       
-      {mediaType === 'video' && (
+      {mediaType === 'video' && isThumbnail && (
         <video 
           controls={false}
           autoPlay={false}
           muted={true}
           className={classNames({[styles.active] : fileId == activeId})}
           onError={() => setError('Failed to load video')}
+        >
+          <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
+          Your browser does not support this video format.
+        </video>
+      )}
+
+      {mediaType === 'video' && !isThumbnail && (
+        <video 
+          controls={false}
+          autoPlay={false}
+          muted={true}
+          onError={() => setError('Failed to load video')}
           ref={videoRef}
-          onClick={handlePlayVideo}
         >
           <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
           Your browser does not support this video format.

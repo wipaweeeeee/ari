@@ -10,6 +10,7 @@ const Grid = ({show, data}) => {
     const [activeContent, setActiveContent] = useState("");
     const [activeName, setActiveName] = useState("");
     const [mobile, setMobile] = useState(false);
+    const [playVideo, setPlayVideo] = useState(false); 
 
     const handleSelect = (id) => {
         setActiveId(id);
@@ -18,13 +19,14 @@ const Grid = ({show, data}) => {
         let name = data.filter(item => item.gid == id)[0].name;
         setActiveContent(message);
         setActiveName(name);
+        // setPlayVideo(!playVideo);
     }
 
     let images = data && data.map((item, index) => {
         if (item.gid != null) {
         return (
             <div key={index} onClick={() => handleSelect(item.gid)}>
-                <DriveMedia fileId={item.gid} activeId={activeId} className={styles.imageItem} isThumbnail={true} />
+                <DriveMedia fileId={item.gid} activeId={activeId} className={styles.imageItem} play={false} isThumbnail={true}/>
             </div>
         )
         }
@@ -100,7 +102,7 @@ const Grid = ({show, data}) => {
                 className={styles.imageContainer}
                 animate={  activeId == null ? { opacity: 0} : {opacity: 1}}
             >
-                 <DriveMedia fileId={activeId} activeId={null} className={styles.fullscreenImage} isThumbnail={false}/>
+                 <DriveMedia fileId={activeId} activeId={null} className={styles.fullscreenImage} play={playVideo} isThumbnail={false}/>
             </motion.div>
             <motion.div
                 animate={  activeContent == "" ? { opacity: 0} : {opacity: 1}}
