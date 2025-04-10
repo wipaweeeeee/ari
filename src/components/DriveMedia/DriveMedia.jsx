@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames'
 import styles from './styles.module.scss'
 
 // This component fetches and displays media from Google Drive based on a file ID.
 // It handles both images and videos, and provides error handling for unsupported media types.
-const DriveMedia = ({ fileId, className, activeId }) => {
+const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const videoRef = useRef();
 
   useEffect(() => {
     if (!fileId) {
@@ -65,6 +67,14 @@ const DriveMedia = ({ fileId, className, activeId }) => {
   if (loading) return <div>Loading media...</div>;
   if (error) return <div className="error">Error: {error}</div>;
 
+  const handlePlayVideo = () => {
+    console.log('here');
+    if (!isThumbnail) {
+      videoRef.current.play();
+      videoRef.current.muted = false;
+    }
+  }
+
   return (
     <div className={className}>
       {mediaType === 'image' && (
@@ -78,9 +88,13 @@ const DriveMedia = ({ fileId, className, activeId }) => {
       
       {mediaType === 'video' && (
         <video 
-          controls
+          controls={false}
+          autoPlay={false}
+          muted={true}
           className={classNames({[styles.active] : fileId == activeId})}
           onError={() => setError('Failed to load video')}
+          ref={videoRef}
+          onClick={handlePlayVideo}
         >
           <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
           Your browser does not support this video format.

@@ -4,7 +4,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: 100dvh;
         color: $yellow;
         text-transform: uppercase;
         font-size: 50px;
@@ -19,12 +19,19 @@
                 padding: 20px 120px;
                 border-radius: 99px;
                 border: 1px solid $yellow;
+                background-color: rgba($yellow, 0.4);
                 cursor: pointer;
 
                 &:first-child {
-                    background-color: $yellow;
-                    color: #000;
+                    background-color: rgba($yellow, 0);
+                    border: 1px solid $yellow;
+                    color: $yellow;
                     margin-right: 90px;
+                }
+
+                &:hover {
+                    background-color: rgba($yellow, 1);
+                    color: black;
                 }
                 
             }
@@ -43,6 +50,10 @@
         top: -50px;
         left: -50px;
         z-index: -1;
+
+        @include tablet {
+            filter: blur(12px);
+        }
     }
 }
 
