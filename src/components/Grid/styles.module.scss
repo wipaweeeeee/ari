@@ -34,7 +34,8 @@
         position: fixed;
         bottom: 28px;
         display: flex;
-        overflow: scroll;
+        overflow-x: scroll;
+        overflow-y: hidden;
         width: 100vw;
         height: 144px;
 
@@ -63,7 +64,7 @@
             left: 50%;
             transform: translateX(-50%);
 
-            img {
+            img, video {
                 height: 100%;
             }
         }

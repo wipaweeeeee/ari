@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames'
 import styles from './styles.module.scss'
 
 // This component fetches and displays media from Google Drive based on a file ID.
 // It handles both images and videos, and provides error handling for unsupported media types.
-const DriveMedia = ({ fileId, className, activeId }) => {
+const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const videoRef = useRef();
 
   useEffect(() => {
     if (!fileId) {
@@ -62,8 +64,26 @@ const DriveMedia = ({ fileId, className, activeId }) => {
     fetchMedia();
   }, [fileId]);
 
-  if (loading) return <div>Loading media...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  useEffect(() => {
+
+      if (mediaType == 'video') {
+        if (videoRef.current != null) {
+          videoRef.current.play();
+          videoRef.current.muted = false;
+          videoRef.current.loop = true;
+        }
+      } else {
+        if (videoRef.current != null) { 
+          videoRef.current.pause();
+          videoRef.current.muted = true;
+          videoRef.current.loop = false;
+        }
+      }
+    
+  },[mediaType])
+
+  if (loading) return <div className={classNames(className, styles.status)}>Loading..</div>;
+  if (error) return <div className={classNames(className, styles.status)}>Error: {error}</div>;
 
   return (
     <div className={className}>
@@ -76,11 +96,26 @@ const DriveMedia = ({ fileId, className, activeId }) => {
         />
       )}
       
-      {mediaType === 'video' && (
+      {mediaType === 'video' && isThumbnail && (
         <video 
-          controls
+          controls={false}
+          autoPlay={false}
+          muted={true}
           className={classNames({[styles.active] : fileId == activeId})}
           onError={() => setError('Failed to load video')}
+        >
+          <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
+          Your browser does not support this video format.
+        </video>
+      )}
+
+      {mediaType === 'video' && !isThumbnail && (
+        <video 
+          controls={false}
+          autoPlay={false}
+          muted={true}
+          onError={() => setError('Failed to load video')}
+          ref={videoRef}
         >
           <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
           Your browser does not support this video format.

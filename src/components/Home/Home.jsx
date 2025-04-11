@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import styles from './styles.module.scss'
 import Grid from '@/components/Grid'
+import Chaos from '@/components/Chaos'
 import Nav from '@/components/Nav'
 import useAriData from '@/hooks/useAriData';
 
@@ -44,13 +45,17 @@ const Home = () => {
             >
                 Are you at least 21 years of age?
                 <div className={styles.buttonsContainer}>
-                    <div className={styles.button}>maybe</div>
+                    <div className={styles.button} onClick={() => setEnter(true)}>maybe</div>
                     <div className={styles.button} onClick={() => setEnter(true)}>yes</div>
                 </div>
             </motion.div>
 
             <AnimatePresence>
-            { enter &&  <Grid show={enter} data={shuffle(data)}/>}
+            { enter && activeMode == "grid" && <Grid show={enter} data={shuffle(data)}/>}
+            </AnimatePresence>
+
+            <AnimatePresence>
+            { enter && activeMode == "chaos" && <Chaos show={enter} data={shuffle(data)}/>}
             </AnimatePresence>
            
             <div className={styles.bg}/>
