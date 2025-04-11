@@ -12,23 +12,6 @@ const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
 
   const videoRef = useRef();
 
-    //handle play video
-    // useEffect(() => {
-    //   if (play) {
-    //     if (videoRef.current != null) {
-    //       console.log('play')
-    //       videoRef.current.play();
-    //       videoRef.current.muted = false;
-    //     }
-    //   } else {
-    //     if (videoRef.current != null) { 
-    //       console.log('pause')
-    //       videoRef.current.pause();
-    //       videoRef.current.muted = true;
-    //     }
-    //   }
-    // },[play])
-
   useEffect(() => {
     if (!fileId) {
       setError('No file ID provided');
@@ -84,23 +67,23 @@ const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
   useEffect(() => {
 
       if (mediaType == 'video') {
-        console.log("play video here")
         if (videoRef.current != null) {
           videoRef.current.play();
           videoRef.current.muted = false;
+          videoRef.current.loop = true;
         }
       } else {
-        console.log('pause video')
         if (videoRef.current != null) { 
           videoRef.current.pause();
           videoRef.current.muted = true;
+          videoRef.current.loop = false;
         }
       }
     
   },[mediaType])
 
-  if (loading) return <div>Loading media...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (loading) return <div className={classNames(className, styles.status)}>Loading..</div>;
+  if (error) return <div className={classNames(className, styles.status)}>Error: {error}</div>;
 
   return (
     <div className={className}>

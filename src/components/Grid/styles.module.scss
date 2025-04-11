@@ -34,7 +34,8 @@
         position: fixed;
         bottom: 28px;
         display: flex;
-        overflow: scroll;
+        overflow-x: scroll;
+        overflow-y: hidden;
         width: 100vw;
         height: 144px;
 

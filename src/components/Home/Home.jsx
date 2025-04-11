@@ -45,7 +45,7 @@ const Home = () => {
             >
                 Are you at least 21 years of age?
                 <div className={styles.buttonsContainer}>
-                    <div className={styles.button}>maybe</div>
+                    <div className={styles.button} onClick={() => setEnter(true)}>maybe</div>
                     <div className={styles.button} onClick={() => setEnter(true)}>yes</div>
                 </div>
             </motion.div>

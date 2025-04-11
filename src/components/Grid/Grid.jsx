@@ -84,7 +84,7 @@ const Grid = ({show, data}) => {
                 <motion.div
                     className={styles.greeting}
                     initial={{ fontSize: '60px', lineHeight: '60px' }}
-                    animate={{ fontSize: '20px', lineHeight: '20px', top: '60dvh', left: '0', textAlign: 'center' }}
+                    animate={{ fontSize: '20px', lineHeight: '20px', top: '62dvh', left: '0', textAlign: 'center' }}
                     transition={{ duration: 0.5, ease: 'easeOut', delay: 1.5 }}
                 >
                     Happy 40th Birthday Ari!
