@@ -15304,10 +15304,10 @@ var {
 
 // netlify/functions/fetch-ari-data.js
 import_dotenv.default.config();
-var handler = async () => {
+var handler = async (event) => {
   const SHEET_ID = "136MtmqAsa04as6RQCtssOBi5ZzbhhmBsq40Tu_RDmYY";
-  const RANGE = "Form Responses 1";
   const API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
+  const { RANGE } = event.queryStringParameters;
   if (!API_KEY) {
     return {
       statusCode: 500,

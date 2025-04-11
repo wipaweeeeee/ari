@@ -9,7 +9,7 @@ const useAriData = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('/api/fetch-ari-data');
+                const response = await fetch('/api/fetch-ari-data?RANGE=Form Responses 1');
                 if (!response.ok) {
                     throw new Error(`Error: ${response.statusText}`);
                 }
@@ -20,7 +20,18 @@ const useAriData = () => {
                     return true;
                 });
 
-                const formatted = filtered.map((item) => {
+                const noMessages = await fetch('/api/fetch-ari-data?RANGE=All');
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+                const noMessagesResult = await noMessages.json();
+                const noMessagesFiltered = noMessagesResult.values.filter((item, index) => {
+                    if ( index === 0 ) false;
+                    if ( item.length === 0 || item === null) return false;
+                    return true;
+                });
+
+                const formatted = [ ...filtered, ...noMessagesFiltered].map((item) => {
                     const link = item[3];
                     let gid = null;
 

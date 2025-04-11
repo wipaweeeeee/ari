@@ -51,11 +51,11 @@ const Home = () => {
             </motion.div>
 
             <AnimatePresence>
-            { enter && activeMode == "grid" && <Grid show={enter} data={shuffle(data)}/>}
+            { data && enter && activeMode == "grid" && <Grid show={enter} data={shuffle(data)}/>}
             </AnimatePresence>
 
             <AnimatePresence>
-            { enter && activeMode == "chaos" && <Chaos show={enter} data={shuffle(data)}/>}
+            { data && enter && activeMode == "chaos" && <Chaos show={enter} data={shuffle(data)}/>}
             </AnimatePresence>
            
             <div className={styles.bg}/>
