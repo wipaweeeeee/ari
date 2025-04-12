@@ -4,7 +4,7 @@ import styles from './styles.module.scss';
 import MediaLoader from '@/utils/media-loader';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
-const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
+const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play, onLoadError }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -13,18 +13,32 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const isVisible = useIntersectionObserver(containerRef, {
-    rootMargin: '200px', // start fetching slightly before it enters view
+    rootMargin: '200px',
     threshold: 0.1,
   });
 
+  const handleError = (msg) => {
+    console.error(msg);
+    setError(msg);
+    if (onLoadError) onLoadError(fileId); // Notify parent
+  };
+
   useEffect(() => {
-    if (!isVisible || !fileId ) return;
+    if (!isVisible || (!fileId && !video)) return;
 
     const loadMedia = async () => {
       try {
         setLoading(true);
-        const result = await MediaLoader.getMedia(fileId);
 
+        if (video) {
+          setMediaUrl(video);
+          setMediaType('video');
+          setError(null);
+          setLoading(false);
+          return;
+        }
+
+        const result = await MediaLoader.getMedia(fileId);
         if (result.error) throw new Error(result.error);
         if (!['image', 'video'].includes(result.type)) {
           throw new Error(`Unsupported media type: ${result.type}`);
@@ -34,48 +48,56 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
         setMediaType(result.type);
         setError(null);
       } catch (err) {
-        console.error('Media load error:', err);
-        setError(err.message);
+        handleError(`Failed to load media: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
     loadMedia();
-  }, [isVisible, fileId]);
+  }, [isVisible, fileId, video]);
 
+  // Control video playback when active
   useEffect(() => {
-    if (mediaType === 'video' && videoRef.current && fileId === activeId) {
-      videoRef.current.play();
-      videoRef.current.muted = false;
+    if (mediaType === 'video' && videoRef.current) {
       videoRef.current.loop = true;
-    } else if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.muted = true;
-      videoRef.current.loop = false;
+      videoRef.current.muted = !play;
+  
+      if (play) {
+        videoRef.current
+          .play()
+          .catch((err) => console.warn('Autoplay blocked:', err));
+      } else {
+        videoRef.current.pause();
+      }
     }
-  }, [ mediaType ]);
+  }, [mediaType, play]);
 
   return (
     <div ref={containerRef} className={className}>
       {loading && <div className={styles.status}>Loading…</div>}
       {error && <div className={styles.status}>Error: {error}</div>}
+
       {!loading && !error && mediaType === 'image' && (
         <img
           className={classNames({ [styles.active]: fileId === activeId })}
           src={mediaUrl}
-          alt={ `Media ${fileId}`}
-          onError={() => setError(`Failed to load image ${fileId}`)}
+          alt={`Media ${fileId}`}
+          onError={() => handleError(`Failed to load image ${fileId}`)}
         />
       )}
+
       {!loading && !error && mediaType === 'video' && (
-        <video
-          ref={videoRef}
-          src={mediaUrl}
-          className={classNames({ [styles.active]: fileId === activeId })}
-          controls={!isThumbnail}
-          onError={() => setError('Failed to load video')}
-        />
+      <video
+        ref={videoRef}
+        src={mediaUrl}
+        className={classNames({ [styles.active]: fileId === activeId })}
+        controls={!isThumbnail}
+        playsInline={!isThumbnail}
+        preload="metadata"
+        muted={!play}
+        onError={() => handleError(`Failed to load video ${fileId}`)}
+      />
       )}
     </div>
   );
