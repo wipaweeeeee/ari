@@ -1,38 +1,33 @@
 import { useState, useEffect, useRef } from 'react';
-import classNames from 'classnames'
-import styles from './styles.module.scss'
+import classNames from 'classnames';
+import styles from './styles.module.scss';
 import MediaLoader from '@/utils/media-loader';
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
-// This component fetches and displays media from Google Drive based on a file ID.
-// It handles both images and videos, and provides error handling for unsupported media types.
-const DriveMedia = ({ fileId, className, activeId, play, isThumbnail, isVideo }) => {
+const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const videoRef = useRef();
+  const containerRef = useRef(null);
+  const videoRef = useRef(null);
+  const isVisible = useIntersectionObserver(containerRef, {
+    rootMargin: '200px', // start fetching slightly before it enters view
+    threshold: 0.1,
+  });
 
   useEffect(() => {
-    if (!fileId) {
-      setError('No file ID provided');
-      setLoading(false);
-      return;
-    }
+    if (!isVisible || !fileId ) return;
 
     const loadMedia = async () => {
       try {
         setLoading(true);
         const result = await MediaLoader.getMedia(fileId);
 
-        console.log('Media result:', result);
-        
-        if (result.error) {
-          throw new Error(result.error);
-        }
-
+        if (result.error) throw new Error(result.error);
         if (!['image', 'video'].includes(result.type)) {
-          throw new Error(`Unsupported media type: ${ result.type }`);
+          throw new Error(`Unsupported media type: ${result.type}`);
         }
 
         setMediaUrl(result.url);
@@ -41,42 +36,47 @@ const DriveMedia = ({ fileId, className, activeId, play, isThumbnail, isVideo })
       } catch (err) {
         console.error('Media load error:', err);
         setError(err.message);
-        setMediaUrl(null);
       } finally {
         setLoading(false);
       }
     };
 
     loadMedia();
-  }, [fileId]);
+  }, [isVisible, fileId]);
 
-  useEffect(()=> {
-    if (mediaType == 'video') {
-      if (videoRef.current != null) {
-        videoRef.current.play();
-        videoRef.current.muted = false;
-        videoRef.current.loop = true;
-      }
-    } else {
-      if (videoRef.current != null) { 
-        videoRef.current.pause();
-        videoRef.current.muted = true;
-        videoRef.current.loop = false;
-      }
+  useEffect(() => {
+    if (mediaType === 'video' && videoRef.current) {
+      videoRef.current.play();
+      videoRef.current.muted = false;
+      videoRef.current.loop = true;
+    } else if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.muted = true;
+      videoRef.current.loop = false;
     }
   }, [mediaType]);
 
-  if (loading) return <div className={classNames(className, styles.status)}>Loading..</div>;
-  if (error) return <div className={classNames(className, styles.status)}>Error: {error}</div>;
-
   return (
-    <div className={className}>
-      {mediaType === 'image' && (
-        <img 
-          className={classNames({[styles.active] : fileId == activeId})}
+    <div ref={containerRef} className={className}>
+      {loading && <div className={styles.status}>Loading…</div>}
+      {error && <div className={styles.status}>Error: {error}</div>}
+      {!loading && !error && mediaType === 'image' && (
+        <img
+          className={classNames({ [styles.active]: fileId === activeId })}
           src={mediaUrl}
-          alt="Google Drive content"
-          onError={() => setError('Failed to load image')}
+          alt={ `Media ${fileId}`}
+          onError={() => setError(`Failed to load image ${fileId}`)}
+        />
+      )}
+      {!loading && !error && mediaType === 'video' && (
+        <video
+          ref={videoRef}
+          src={mediaUrl}
+          className={classNames({ [styles.active]: fileId === activeId })}
+          muted
+          autoPlay="false"
+          controls={!isThumbnail}
+          onError={() => setError('Failed to load video')}
         />
       )}
     </div>
