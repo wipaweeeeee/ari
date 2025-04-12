@@ -12,6 +12,7 @@ const Grid = ({show, data}) => {
     const [activeName, setActiveName] = useState("");
     const [mobile, setMobile] = useState(false);
     const [playVideo, setPlayVideo] = useState(false); 
+    const [erroredIds, setErroredIds] = useState([]);
 
     const handleSelect = (id) => {
         setActiveId(id);
@@ -24,15 +25,28 @@ const Grid = ({show, data}) => {
         // setPlayVideo(!playVideo);
     }
 
-    let images = data && data.map((item, index) => {
-        const { gid, video } = item;
-        if ( gid != null ) {
-            return (
-                <div key={index} onClick={() => handleSelect(gid)}>
-                    <DriveMedia video={video} fileId={gid} activeId={activeId} className={styles.imageItem} play={false} isThumbnail={true}/>
-                </div>
-            )
-        }
+    const handleMediaError = (id) => {
+        setErroredIds((prev) => [...prev, id]);
+      };
+
+    const images = data?.map((item, index) => {
+    const { gid, video } = item;
+    
+    if (!gid || erroredIds.includes(gid)) return null;
+    
+    return (
+        <div key={index} onClick={() => handleSelect(gid)}>
+        <DriveMedia
+            video={video}
+            fileId={gid}
+            activeId={activeId}
+            className={styles.imageItem}
+            play={false}
+            isThumbnail={true}
+            onLoadError={handleMediaError}
+        />
+        </div>
+    );
     });
 
     //handles responsive

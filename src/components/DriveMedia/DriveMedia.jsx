@@ -4,7 +4,7 @@ import styles from './styles.module.scss';
 import MediaLoader from '@/utils/media-loader';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
-const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play }) => {
+const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play, onLoadError }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,12 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play }) =
     threshold: 0.1,
   });
 
-  // Load media when visible (if no direct video prop is passed)
+  const handleError = (msg) => {
+    console.error(msg);
+    setError(msg);
+    if (onLoadError) onLoadError(fileId); // Notify parent
+  };
+
   useEffect(() => {
     if (!isVisible || (!fileId && !video)) return;
 
@@ -34,7 +39,6 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play }) =
         }
 
         const result = await MediaLoader.getMedia(fileId);
-
         if (result.error) throw new Error(result.error);
         if (!['image', 'video'].includes(result.type)) {
           throw new Error(`Unsupported media type: ${result.type}`);
@@ -44,8 +48,7 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play }) =
         setMediaType(result.type);
         setError(null);
       } catch (err) {
-        console.error('Media load error:', err);
-        setError(err.message);
+        handleError(`Failed to load media: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -80,7 +83,7 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play }) =
           className={classNames({ [styles.active]: fileId === activeId })}
           src={mediaUrl}
           alt={`Media ${fileId}`}
-          onError={() => setError(`Failed to load image ${fileId}`)}
+          onError={() => handleError(`Failed to load image ${fileId}`)}
         />
       )}
 
@@ -93,7 +96,7 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play }) =
         playsInline={!isThumbnail}
         preload="metadata"
         muted={!play}
-        onError={() => setError('Failed to load video')}
+        onError={() => handleError(`Failed to load video ${fileId}`)}
       />
       )}
     </div>
