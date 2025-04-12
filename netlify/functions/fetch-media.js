@@ -19,7 +19,8 @@ export const handler = async (event) => {
     });
 
     // If response looks like HTML (failed download), try the viewer link
-    const contentType = response.headers['content-type'];
+    let contentType = response.headers['content-type'] || 'application/octet-stream';
+
     if (contentType?.includes('text/html')) {
       response = await axios.get(`https://drive.google.com/uc?export=view&id=${fileId}`, {
         responseType: 'arraybuffer'
@@ -31,17 +32,11 @@ export const handler = async (event) => {
       throw new Error(`Google Drive responded with ${response.status}`);
     }
 
-    // Convert to base64
-    const imageData = Buffer.from(response.data).toString('base64');
+    let buffer = Buffer.from(response.data);
     
-    // Basic base64 validation
-    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(imageData)) {
-      throw new Error('Invalid base64 image data received');
-    }
-
     return {
       statusCode: 200,
-      body: imageData,
+      body: buffer.toString('base64'),
       isBase64Encoded: true,
       headers: {
         'Content-Type': response.headers['content-type'] || 'image/jpeg',

@@ -45,7 +45,7 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
   }, [isVisible, fileId]);
 
   useEffect(() => {
-    if (mediaType === 'video' && videoRef.current) {
+    if (mediaType === 'video' && videoRef.current && fileId === activeId) {
       videoRef.current.play();
       videoRef.current.muted = false;
       videoRef.current.loop = true;
@@ -54,7 +54,7 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
       videoRef.current.muted = true;
       videoRef.current.loop = false;
     }
-  }, [mediaType]);
+  }, [ mediaType ]);
 
   return (
     <div ref={containerRef} className={className}>
@@ -73,8 +73,6 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
           ref={videoRef}
           src={mediaUrl}
           className={classNames({ [styles.active]: fileId === activeId })}
-          muted
-          autoPlay="false"
           controls={!isThumbnail}
           onError={() => setError('Failed to load video')}
         />
