@@ -94,7 +94,7 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play, onL
         className={classNames({ [styles.active]: fileId === activeId })}
         controls={!isThumbnail}
         playsInline={!isThumbnail}
-        preload="metadata"
+        preload="auto"
         muted={!play}
         onError={() => handleError(`Failed to load video ${fileId}`)}
       />
