@@ -118,7 +118,7 @@ const Grid = ({show, data}) => {
                 className={styles.imageContainer}
                 animate={  activeId == null ? { opacity: 0} : {opacity: 1}}
             >
-            <DriveMedia video={activeVideo} fileId={activeId} activeId={activeId} className={styles.fullscreenImage} play={true} isThumbnail={false}/>
+            <DriveMedia video={activeVideo} fileId={activeId} activeId={null} className={styles.fullscreenImage} play={true} isThumbnail={false}/>
             </motion.div>
             <motion.div
                 animate={  activeContent == "" ? { opacity: 0} : {opacity: 1}}
