@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames'
 import styles from './styles.module.scss'
+import MediaLoader from '@/utils/media-loader';
 
 // This component fetches and displays media from Google Drive based on a file ID.
 // It handles both images and videos, and provides error handling for unsupported media types.
-const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
+const DriveMedia = ({ fileId, className, activeId, play, isThumbnail, isVideo }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,38 +20,23 @@ const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
       return;
     }
 
-    const fetchMedia = async () => {
+    const loadMedia = async () => {
       try {
         setLoading(true);
-        const url = `/.netlify/functions/fetch-media?fileId=${fileId}`;
-        const response = await fetch(url);
+        const result = await MediaLoader.getMedia(fileId);
+
+        console.log('Media result:', result);
         
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
+        if (result.error) {
+          throw new Error(result.error);
         }
 
-        // Get content type from headers
-        const contentType = response.headers.get('content-type');
-        
-        // Determine media type based on content type or file extension
-        let detectedType = 'unknown';
-        if (contentType?.startsWith('image/')) {
-          detectedType = 'image';
-        } 
-        else if (contentType?.startsWith('video/')) {
-          detectedType = 'video';
-        }
-        else if (contentType === 'application/octet-stream' || 
-                 fileId.toLowerCase().endsWith('.mov')) {
-          detectedType = 'video'; // Assume MOV files are videos
+        if (!['image', 'video'].includes(result.type)) {
+          throw new Error(`Unsupported media type: ${ result.type }`);
         }
 
-        if (detectedType === 'unknown') {
-          throw new Error(`Unsupported media type: ${contentType}`);
-        }
-
-        setMediaType(detectedType);
-        setMediaUrl(url);
+        setMediaUrl(result.url);
+        setMediaType(result.type);
         setError(null);
       } catch (err) {
         console.error('Media load error:', err);
@@ -61,26 +47,24 @@ const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
       }
     };
 
-    fetchMedia();
+    loadMedia();
   }, [fileId]);
 
-  useEffect(() => {
-
-      if (mediaType == 'video') {
-        if (videoRef.current != null) {
-          videoRef.current.play();
-          videoRef.current.muted = false;
-          videoRef.current.loop = true;
-        }
-      } else {
-        if (videoRef.current != null) { 
-          videoRef.current.pause();
-          videoRef.current.muted = true;
-          videoRef.current.loop = false;
-        }
+  useEffect(()=> {
+    if (mediaType == 'video') {
+      if (videoRef.current != null) {
+        videoRef.current.play();
+        videoRef.current.muted = false;
+        videoRef.current.loop = true;
       }
-    
-  },[mediaType])
+    } else {
+      if (videoRef.current != null) { 
+        videoRef.current.pause();
+        videoRef.current.muted = true;
+        videoRef.current.loop = false;
+      }
+    }
+  }, [mediaType]);
 
   if (loading) return <div className={classNames(className, styles.status)}>Loading..</div>;
   if (error) return <div className={classNames(className, styles.status)}>Error: {error}</div>;
@@ -94,32 +78,6 @@ const DriveMedia = ({ fileId, className, activeId, play, isThumbnail }) => {
           alt="Google Drive content"
           onError={() => setError('Failed to load image')}
         />
-      )}
-      
-      {mediaType === 'video' && isThumbnail && (
-        <video 
-          controls={false}
-          autoPlay={false}
-          muted={true}
-          className={classNames({[styles.active] : fileId == activeId})}
-          onError={() => setError('Failed to load video')}
-        >
-          <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
-          Your browser does not support this video format.
-        </video>
-      )}
-
-      {mediaType === 'video' && !isThumbnail && (
-        <video 
-          controls={false}
-          autoPlay={false}
-          muted={true}
-          onError={() => setError('Failed to load video')}
-          ref={videoRef}
-        >
-          <source src={mediaUrl} type={mediaUrl?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
-          Your browser does not support this video format.
-        </video>
       )}
     </div>
   );

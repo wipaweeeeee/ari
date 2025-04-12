@@ -23,15 +23,15 @@ const Grid = ({show, data}) => {
     }
 
     let images = data && data.map((item, index) => {
-        if (item.gid != null) {
-        return (
-            <div key={index} onClick={() => handleSelect(item.gid)}>
-                <DriveMedia fileId={item.gid} activeId={activeId} className={styles.imageItem} play={false} isThumbnail={true}/>
-            </div>
-        )
+        const { gid, isVideo } = item;
+        if ( gid != null ) {
+            return (
+                <div key={index} onClick={() => handleSelect(gid)}>
+                    <DriveMedia isVideo={isVideo} fileId={gid} activeId={activeId} className={styles.imageItem} play={false} isThumbnail={true}/>
+                </div>
+            )
         }
-       
-    })
+    });
 
     //handles responsive
     useEffect(() => {

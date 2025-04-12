@@ -14,7 +14,9 @@
     "classnames": "^2.5.1",
     "dotenv": "^16.4.7",
     "framer-motion": "^12.6.3",
+    "googleapis": "^148.0.0",
     "node-fetch": "^3.3.2",
+    "p-limit": "^6.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-dvd-screensaver": "^0.1.1"
