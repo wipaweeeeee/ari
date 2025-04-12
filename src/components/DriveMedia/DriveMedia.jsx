@@ -4,7 +4,7 @@ import styles from './styles.module.scss';
 import MediaLoader from '@/utils/media-loader';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
-const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
+const DriveMedia = ({ fileId, className, activeId, isThumbnail, video, play }) => {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -13,16 +13,26 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const isVisible = useIntersectionObserver(containerRef, {
-    rootMargin: '200px', // start fetching slightly before it enters view
+    rootMargin: '200px',
     threshold: 0.1,
   });
 
+  // Load media when visible (if no direct video prop is passed)
   useEffect(() => {
-    if (!isVisible || !fileId ) return;
+    if (!isVisible || (!fileId && !video)) return;
 
     const loadMedia = async () => {
       try {
         setLoading(true);
+
+        if (video) {
+          setMediaUrl(video);
+          setMediaType('video');
+          setError(null);
+          setLoading(false);
+          return;
+        }
+
         const result = await MediaLoader.getMedia(fileId);
 
         if (result.error) throw new Error(result.error);
@@ -42,40 +52,49 @@ const DriveMedia = ({ fileId, className, activeId, isThumbnail }) => {
     };
 
     loadMedia();
-  }, [isVisible, fileId]);
+  }, [isVisible, fileId, video]);
 
+  // Control video playback when active
   useEffect(() => {
-    if (mediaType === 'video' && videoRef.current && fileId === activeId) {
-      videoRef.current.play();
-      videoRef.current.muted = false;
+    if (mediaType === 'video' && videoRef.current) {
       videoRef.current.loop = true;
-    } else if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.muted = true;
-      videoRef.current.loop = false;
+      videoRef.current.muted = !play;
+  
+      if (play) {
+        videoRef.current
+          .play()
+          .catch((err) => console.warn('Autoplay blocked:', err));
+      } else {
+        videoRef.current.pause();
+      }
     }
-  }, [ mediaType ]);
+  }, [mediaType, play]);
 
   return (
     <div ref={containerRef} className={className}>
       {loading && <div className={styles.status}>Loading…</div>}
       {error && <div className={styles.status}>Error: {error}</div>}
+
       {!loading && !error && mediaType === 'image' && (
         <img
           className={classNames({ [styles.active]: fileId === activeId })}
           src={mediaUrl}
-          alt={ `Media ${fileId}`}
+          alt={`Media ${fileId}`}
           onError={() => setError(`Failed to load image ${fileId}`)}
         />
       )}
+
       {!loading && !error && mediaType === 'video' && (
-        <video
-          ref={videoRef}
-          src={mediaUrl}
-          className={classNames({ [styles.active]: fileId === activeId })}
-          controls={!isThumbnail}
-          onError={() => setError('Failed to load video')}
-        />
+      <video
+        ref={videoRef}
+        src={mediaUrl}
+        className={classNames({ [styles.active]: fileId === activeId })}
+        controls={!isThumbnail}
+        playsInline={!isThumbnail}
+        preload="metadata"
+        muted={!play}
+        onError={() => setError('Failed to load video')}
+      />
       )}
     </div>
   );

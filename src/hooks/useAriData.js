@@ -50,7 +50,7 @@ const useAriData = () => {
                         name: item[1],
                         message: item[2],
                         gid: gid || null,
-                        isVideo: item[4] === 'mov' || item[4] === 'mp4',
+                        video: item[ 4 ] || null,
                     };
                 });
                 
